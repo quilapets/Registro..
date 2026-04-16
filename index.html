@@ -12,10 +12,19 @@
             background: linear-gradient(rgba(20, 45, 20, 0.8), rgba(20, 45, 20, 0.8)), url('https://transparenttextures.com');
             background-color: #1a2e1a;
         }
-        .hidden-field { display: none; }
+        .hidden-field { display: none !important; }
         .brand-bg { background-color: #424242; } 
         .brand-green-text { color: #A4F13E; }
-        input, select { border: 2px solid #cbd5e1 !important; border-radius: 8px !important; padding: 10px !important; }
+        
+        input, select, textarea { 
+            border: 2px solid #cbd5e1 !important; 
+            background-color: #ffffff !important;
+        }
+        input:focus, select:focus {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
         .loading-overlay {
             display: none;
             position: fixed;
@@ -24,6 +33,11 @@
             z-index: 50;
             justify-content: center;
             align-items: center;
+        }
+
+        .specie-card {
+            transition: all 0.2s ease;
+            border-width: 2px;
         }
     </style>
 </head>
@@ -39,68 +53,79 @@
             <h1 class="brand-green-text text-2xl md:text-3xl font-bold tracking-tight">
                 Club de Amigos Quilapets 🐾
             </h1>
-            <p class="text-white text-sm mt-2">Inscribe a tu compañero y recibe beneficios</p>
         </div>
 
         <form id="petForm" class="p-6 space-y-6">
-            <!-- SECCIÓN TUTOR -->
             <section class="space-y-4">
                 <h2 class="text-sm font-bold text-indigo-700 uppercase border-b-2 border-indigo-100 pb-1">1. Datos del Tutor</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-700 mb-1">Nombre del Tutor</label>
-                        <input type="text" required name="nombre_tutor" placeholder="Ej: Juan Pérez" class="block w-full text-sm">
+                        <input type="text" required name="nombre_tutor" placeholder="Ej: Juan Pérez" class="block w-full rounded-lg p-2.5 text-sm outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-700 mb-1">Tu WhatsApp</label>
-                        <input type="text" required name="whatsapp" placeholder="569XXXXXXXX" class="block w-full text-sm">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">WhatsApp de Contacto</label>
+                        <input type="text" required name="whatsapp" id="whatsapp" placeholder="569XXXXXXXX" class="block w-full rounded-lg p-2.5 text-sm outline-none">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-gray-700 mb-1">Sector de Despacho</label>
-                        <select required name="sector" id="sectorSelect" onchange="toggleOtroSector()" class="block w-full text-sm">
+                        <select required name="sector" id="sectorSelect" onchange="toggleOtroSector()" class="block w-full rounded-lg p-2.5 text-sm outline-none">
                             <option value="">Seleccione su ubicación...</option>
-                            <option value="Jardin del Este">Jardín del Este / Barcelona / Emmanuel</option>
-                            <option value="Quilamapu">Quilamapu / Flores Millán</option>
-                            <option value="Camino a Cato">Colonia Bdo. O'Higgins / Camino a Cato</option>
+                            <option value="Jardin del Este / Barcelona / Emmanuel / Toledo / Barrio Universitario">Jardín del Este / Barcelona / Emmanuel / Toledo / Barrio Universitario</option>
+                            <option value="Quilamapu / Flores Millan / San Alberto Hurtado">Quilamapu / Flores Millán / San Alberto Hurtado</option>
+                            <option value="Colonia Bdo. Ohiggins / Camino a Cato">Colonia Bdo. O'Higgins / Camino a Cato</option>
+                            <option value="Camino del Agua / Las Coles / Camino a Coihueco">Camino del Agua / Las Coles / Camino a Coihueco</option>
                             <option value="otro">Otro sector...</option>
                         </select>
                     </div>
                     <div id="divOtroSector" class="md:col-span-2 hidden-field">
-                        <input type="text" id="inputOtro" name="otro_sector" placeholder="¿Cuál es tu sector?" class="block w-full text-sm bg-indigo-50">
+                        <input type="text" id="inputOtroSector" name="otro_sector" placeholder="Especifique su sector de despacho" class="block w-full rounded-lg p-2.5 text-sm bg-indigo-50 border-indigo-200 outline-none">
                     </div>
                 </div>
             </section>
 
-            <!-- SECCIÓN MASCOTA -->
             <section class="space-y-4">
                 <h2 class="text-sm font-bold text-indigo-700 uppercase border-b-2 border-indigo-100 pb-1">2. Información de la Mascota</h2>
+                
+                <p class="text-[11px] text-gray-600 font-bold uppercase text-center mb-2">Selecciona el tipo de mascota:</p>
                 <div class="grid grid-cols-3 gap-3">
                     <label class="cursor-pointer">
                         <input type="radio" name="especie" value="Perro" class="hidden peer" required onchange="updateMascotaUI()">
-                        <div class="p-4 border-2 rounded-xl text-center peer-checked:bg-indigo-600 peer-checked:text-white bg-white font-bold text-xs">🐶 Perro</div>
+                        <div class="specie-card py-4 border-2 border-slate-300 rounded-xl text-center peer-checked:border-indigo-600 peer-checked:bg-indigo-600 peer-checked:text-white bg-white hover:border-indigo-300 transition shadow-sm">
+                            <span class="block text-xl mb-1">🐶</span>
+                            <span class="font-bold text-sm">Perro</span>
+                        </div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="especie" value="Gato" class="hidden peer" onchange="updateMascotaUI()">
-                        <div class="p-4 border-2 rounded-xl text-center peer-checked:bg-indigo-600 peer-checked:text-white bg-white font-bold text-xs">🐈 Gato</div>
+                        <div class="specie-card py-4 border-2 border-slate-300 rounded-xl text-center peer-checked:border-indigo-600 peer-checked:bg-indigo-600 peer-checked:text-white bg-white hover:border-indigo-300 transition shadow-sm">
+                            <span class="block text-xl mb-1">🐈</span>
+                            <span class="font-bold text-sm">Gato</span>
+                        </div>
                     </label>
                     <label class="cursor-pointer">
                         <input type="radio" name="especie" value="Otro" class="hidden peer" onchange="updateMascotaUI()">
-                        <div class="p-4 border-2 rounded-xl text-center peer-checked:bg-indigo-600 peer-checked:text-white bg-white font-bold text-xs">✨ Otro</div>
+                        <div class="specie-card py-4 border-2 border-slate-300 rounded-xl text-center peer-checked:border-indigo-600 peer-checked:bg-indigo-600 peer-checked:text-white bg-white hover:border-indigo-300 transition shadow-sm">
+                            <span class="block text-xl mb-1">✨</span>
+                            <span class="font-bold text-sm">Otro</span>
+                        </div>
                     </label>
                 </div>
 
-                <div id="divCualEspecie" class="hidden-field">
-                    <label class="block text-xs font-bold text-gray-700 mb-1">¿Qué mascota es?</label>
-                    <input type="text" name="cual_especie" class="block w-full text-sm bg-amber-50" placeholder="Ej: Conejo">
-                </div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div id="divCualEspecie" class="hidden-field">
+                        <label class="block text-xs font-bold text-amber-700 mb-1">¿Qué mascota es?</label>
+                        <input type="text" name="cual_especie" placeholder="Ej: Conejo" class="block w-full rounded-lg p-2.5 text-sm bg-amber-50 border-amber-300 outline-none">
+                    </div>
 
-                <div>
-                    <label class="block text-xs font-bold text-gray-700 mb-1">Nombre de la Mascota</label>
-                    <input type="text" required name="pet_nombre" placeholder="Nombre de tu amiguito" class="block w-full text-sm">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Nombre de la Mascota</label>
+                        <input type="text" required name="pet_nombre" placeholder="Nombre" class="block w-full rounded-lg p-2.5 text-sm outline-none">
+                    </div>
                 </div>
             </section>
 
-            <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-all text-lg shadow-lg">
+            <button type="submit" class="w-full brand-bg brand-green-text font-bold py-4 rounded-xl hover:opacity-90 transition-all text-lg shadow-lg">
                 ¡Unirse al Club por WhatsApp! 🚀
             </button>
         </form>
@@ -109,13 +134,18 @@
     <script>
         function toggleOtroSector() {
             const select = document.getElementById('sectorSelect');
-            const div = document.getElementById('divOtroSector');
-            div.style.display = select.value === 'otro' ? 'block' : 'none';
+            const divOtro = document.getElementById('divOtroSector');
+            divOtro.style.display = select.value === 'otro' ? 'block' : 'none';
         }
 
         function updateMascotaUI() {
-            const especie = document.querySelector('input[name="especie"]:checked').value;
-            document.getElementById('divCualEspecie').style.display = especie === 'Otro' ? 'block' : 'none';
+            const especieRadios = document.getElementsByName('especie');
+            let seleccionada = "";
+            for(const radio of especieRadios) {
+                if(radio.checked) seleccionada = radio.value;
+            }
+            const divCual = document.getElementById('divCualEspecie');
+            divCual.style.display = seleccionada === 'Otro' ? 'block' : 'none';
         }
 
         document.getElementById('petForm').addEventListener('submit', function(e) {
@@ -125,16 +155,16 @@
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
 
-            let sectorFinal = data.sector === 'otro' ? data.otro_sector : data.sector;
-            let especieFinal = data.especie === 'Otro' ? data.cual_especie : data.especie;
+            let sector = data.sector === 'otro' ? data.otro_sector : data.sector;
+            let especie = data.especie === 'Otro' ? data.cual_especie : data.especie;
 
-            // Formateo del mensaje para WhatsApp
             let mensaje = `*¡Hola Quilapets! Quiero unirme al Club de Amigos:*%0A%0A`;
             mensaje += `👤 *Tutor:* ${data.nombre_tutor}%0A`;
             mensaje += `📞 *WhatsApp:* ${data.whatsapp}%0A`;
-            mensaje += `📍 *Sector:* ${sectorFinal}%0A`;
-            mensaje += `🐾 *Mascota:* ${data.pet_nombre} (${especieFinal})`;
+            mensaje += `📍 *Sector:* ${sector}%0A`;
+            mensaje += `🐾 *Mascota:* ${data.pet_nombre} (${especie})`;
 
+            // Número configurado sin símbolos raros
             const tuNumero = "56994442330"; 
 
             setTimeout(() => {
