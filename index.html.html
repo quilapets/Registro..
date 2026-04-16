@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro Quilapets - Club de Amigos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: linear-gradient(rgba(20, 45, 20, 0.8), rgba(20, 45, 20, 0.8)), url('https://www.transparenttextures.com/patterns/cubes.png');
+            background-color: #1a2e1a;
+        }
+        .hidden-field { display: none !important; }
+        .brand-bg { background-color: #424242; } 
+        .brand-green-text { color: #A4F13E; }
+        
+        input, select, textarea { 
+            border: 2px solid #cbd5e1 !important; 
+            background-color: #ffffff !important;
+        }
+        input:focus, select:focus {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 50;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .specie-card {
+            transition: all 0.2s ease;
+            border-width: 2px;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-6 px-4">
+
+    <div id="loader" class="loading-overlay flex-col">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        <p class="mt-2 text-indigo-600 font-bold">Procesando registro...</p>
+    </div>
+
+    <div class="max-w-2xl mx-auto bg-slate-50 rounded-xl shadow-2xl overflow-hidden border border-slate-300">
+        <div class="brand-bg p-8 text-center">
+            <h1 class="brand-green-text text-2xl md:text-3xl font-bold tracking-tight">
+                Club de Amigos Quilapets 🐾
+            </h1>
+        </div>
+
+        <form id="petForm" class="p-6 space-y-6">
+            <section class="space-y-4">
+                <h2 class="text-sm font-bold text-indigo-700 uppercase border-b-2 border-indigo-100 pb-1">1. Datos del Tutor</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Nombre del Tutor</label>
+                        <input type="text" required name="nombre_tutor" placeholder="Ej: Juan Pérez" class="block w-full rounded-lg p-2.5 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">WhatsApp de Contacto (11 dígitos)</label>
+                        <input type="text" required name="whatsapp" id="whatsapp" placeholder="569XXXXXXXX" maxlength="11" pattern="\d{11}" title="Debe ingresar exactamente 11 números" class="block w-full rounded-lg p-2.5 text-sm outline-none" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Sector de Despacho</label>
+                        <select required name="sector" id="sectorSelect" onchange="toggleOtroSector()" class="block w-full rounded-lg p-2.5 text-sm outline-none">
+                            <option value="">Seleccione su ubicación...</option>
+                            <option value="Jardin del Este / Barcelona / Emmanuel / Toledo / Barrio Universitario">Jardín del Este / Barcelona / Emmanuel / Toledo / Barrio Universitario</option>
+                            <option value="Quilamapu / Flores Millan / San Alberto Hurtado">Quilamapu / Flores Millán / San Alberto Hurtado</option>
+                            <option value="Colonia Bdo. Ohiggins / Camino a Cato">Colonia Bdo. O'Higgins / Camino a Cato</option>
+                            <option value="Camino del Agua / Las Coles / Camino a Coihueco">Camino del Agua / Las Coles / Camino a Coihueco</option>
+                            <option value="otro">Otro sector...</option>
+                        </select>
+                    </div>
+                    <div id="divOtroSector" class="md:col-span-2 hidden-field">
+                        <input type="text" id="inputOtroSector" name="otro_sector" placeholder="Especifique su sector de despacho" class="block w-full rounded-lg p-2.5 text-sm bg-indigo-50 border-indigo-200 outline-none">
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <h2 class="text-sm font-bold text-indigo-700 uppercase border-b-2 border-indigo-100 pb-1">2. Información de la Mascota</h2>
+                
+                <p class="text-[11px] text-gray-600 font-bold uppercase text-center mb-2">Selecciona el tipo de mascota:</p>
+                <div class="grid grid-cols-3 gap-3">
+                    <label class="cursor-pointer">
+                        <input type="radio" name="especie" value="Perro" class="hidden peer" required onchange="updateMascotaUI()">
+                        <div class="specie-card py-4 border-2 border-slate-300 rounded-xl text-center peer-checked:border-indigo-600 peer-checked:bg-indigo-600 peer-checked:text-white bg-white hover:border-indigo-300 transition shadow-sm">
+                            <span class="block text-xl mb-1">🐶</span>
+                            <span class="font-bold text-sm">Perro</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="especie" value="Gato" class="hidden peer" onchange="updateMascotaUI()">
+                        <div class="specie-card py-4 border-2 border-slate-300 rounded-xl text-center peer-checked:border-indigo-600 peer-checked:bg-indigo-600 peer-checked:text-white bg-white hover:border-indigo-300 transition shadow-sm">
+                            <span class="block text-xl mb-1">🐈</span>
+                            <span class="font-bold text-sm">Gato</span>
+                        </div>
+                    </label>
+                    <label class="cursor-pointer">
+                        <input type="radio" name="especie" value="Otro" class="hidden peer" onchange="updateMascotaUI()">
+                        <div class="specie-card py-4 border-2 border-slate-300 rounded-xl text-center peer-checked:border-indigo-600 peer-checked:bg-indigo-600 peer-checked:text-white bg-white hover:border-indigo-300 transition shadow-sm">
+                            <span class="block text-xl mb-1">✨</span>
+                            <span class="font-bold text-sm">Otro</span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div id="divCualEspecie" class="col-span-2 hidden-field">
+                        <label class="block text-xs font-bold text-amber-700 mb-1">¿Qué mascota es? (Ej: Conejo, Hurón)</label>
+                        <input type="text" id="inputCualEspecie" name="cual_especie" placeholder="Especie" class="block w-full rounded-lg p-2.5 text-sm bg-amber-50 border-amber-300 outline-none" oninput="syncIdMascota()">
+                    </div>
+
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Nombre de la Mascota</label>
+                        <input type="text" required id="inputPetNombre" name="pet_nombre" placeholder="Nombre" class="block w-full rounded-lg p-2.5 text-sm outline-none" oninput="syncIdMascota()">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Sexo</label>
+                        <select required id="inputPetSexo" class="block w-full rounded-lg p-2.5 text-sm outline-none" onchange="syncIdMascota()">
+                            <option value="Macho">Macho</option>
+                            <option value="Hembra">Hembra</option>
+                        </select>
+                    </div>
+
+                    <div id="divRaza">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Raza</label>
+                        <input type="text" id="inputPetRaza" name="raza" placeholder="Ej: Poodle o Mestizo" class="block w-full rounded-lg p-2.5 text-sm outline-none" oninput="syncIdMascota()">
+                    </div>
+
+                    <input type="hidden" name="id_mascota" id="inputIdMascota">
+
+                    <div id="divEtapa" class="hidden-field col-span-2 md:col-span-1">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Etapa de Vida</label>
+                        <select required name="etapa" id="etapaSelect" onchange="updateEtapaUI()" class="block w-full rounded-lg p-2.5 text-sm outline-none">
+                        </select>
+                    </div>
+
+                    <div id="divTamano" class="hidden-field col-span-2 md:col-span-1">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Tamaño de la Raza</label>
+                        <select name="tamano_raza" class="block w-full rounded-lg p-2.5 text-sm outline-none">
+                            <option value="">Seleccionar...</option>
+                            <option value="Pequena (Hasta 10 kg)">Pequeña (Hasta 10 kg)</option>
+                            <option value="Mediana (10 a 25 kg)">Mediana (10 a 25 kg)</option>
+                            <option value="Grande (Mas de 25 kg)">Grande (Más de 25 kg)</option>
+                        </select>
+                    </div>
+
+                    <div id="divPeso" class="hidden-field col-span-2 md:col-span-1">
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Peso Actual (kg entero)</label>
+                        <input type="number" step="1" name="weight" placeholder="Ej: 12" class="block w-full rounded-lg p-2.5 text-sm outline-none" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                </div>
+
+                <div id="detallesEdad" class="hidden-field bg-amber-50 p-4 rounded-xl border-2 border-amber-200 space-y-3">
+                    <div id="campoEdadMeses" class="hidden-field">
+                        <label class="block text-xs font-bold text-amber-900 mb-1">¿Cuántos meses de edad tiene tu mascota? (Número entero)</label>
+                        <input type="number" step="1" name="edad_meses" placeholder="Ej: 4" class="block w-full rounded-lg p-2.5 text-sm bg-white outline-none" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div id="campoPesoEstimado" class="hidden-field">
+                        <label class="block text-xs font-bold text-amber-900 mb-1">Peso estimado de adulto (kg entero)</label>
+                        <input type="number" step="1" name="weight_adult" placeholder="Ej: 20" class="block w-full rounded-lg p-2.5 text-sm bg-white outline-none" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                    <div id="campoAniosVida" class="hidden-field">
+                        <label class="block text-xs font-bold text-amber-900 mb-1">Años de Vida (Número entero)</label>
+                        <input type="number" step="1" name="anios_vida" placeholder="Ej: 5" class="block w-full rounded-lg p-2.5 text-sm bg-white outline-none" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
+                </div>
+            </section>
+
+            <section class="space-y-4">
+                <h2 class="text-sm font-bold text-indigo-700 uppercase border-b-2 border-indigo-100 pb-1">3. Salud y Alimento</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">¿Está esterilizado/a?</label>
+                        <select name="esterilizado" class="block w-full rounded-lg p-2.5 text-sm outline-none">
+                            <option value="No">No</option>
+                            <option value="Si">Sí</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 mb-1">Condición Especial</label>
+                        <select name="condicion" id="condicionSelect" onchange="toggleOtraCondicion()" class="block w-full rounded-lg p-2.5 text-sm outline-none">
+                            <option value="Ninguna">Ninguna / Sano</option>
+                            <option value="Alergico">Alérgico</option>
+                            <option value="Obesidad">Obesidad</option>
+                            <option value="Urinario">Urinario</option>
+                            <option value="Renal">Renal</option>
+                            <option value="Piel Sensible">Piel Sensible</option>
+                            <option value="otro">Otro (Especificar)</option>
+                        </select>
+                    </div>
+
+                    <div id="divOtraCondicion" class="md:col-span-2 hidden-field">
+                        <input type="text" id="inputOtraCondicion" name="otra_condicion" placeholder="Especifique condición de salud" class="block w-full rounded-lg p-2.5 text-sm bg-red-50 border-red-200 outline-none">
+                    </div>
+
+                    <div class="md:col-span-2 grid grid-cols-2 gap-3 bg-white p-4 rounded-xl border-2 border-slate-200 shadow-inner">
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Alimento Actual (Marca y Sabor)</label>
+                            <input type="text" name="alimento_actual" placeholder="Ej: ProPlan Pollo" class="block w-full rounded-lg p-2.5 text-sm outline-none">
+                        </div>
+                        <div class="col-span-2 md:col-span-1">
+                            <label class="block text-[10px] font-bold text-gray-500 uppercase mb-1">Formato KG Saco</label>
+                            <input type="text" 
+                                   name="formato_kg" 
+                                   placeholder="Ej: 15 o 3,5" 
+                                   class="block w-full rounded-lg p-2.5 text-sm outline-none"
+                                   oninput="this.value = this.value.replace(/[^0-9,]/g, '')">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <button type="submit" class="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-indigo-700 transition shadow-lg active:scale-95 transform">
+                ¡Únete al club! 🐾
+            </button>
+        </form>
+
+        <div id="successMessage" class="hidden-field p-12 text-center">
+            <div class="text-6xl mb-4 text-indigo-600 animate-bounce">✨</div>
+            <h2 class="text-2xl font-bold text-gray-800">¡Registro Exitoso!</h2>
+            <p class="text-gray-600 mt-2">Compra tu alimento en nuestra tienda y te acompañaremos para que tu mascota nunca quede con su plato vacío. ¡Te esperamos!</p>
+            <button onclick="location.reload()" class="mt-6 bg-indigo-100 px-8 py-3 rounded-full text-sm font-bold text-indigo-700 hover:bg-indigo-200 transition">Registrar otra mascota</button>
+        </div>
+    </div>
+
+    <script>
+        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzMOOpp2jUyXX1oBs_vfCCIvqkEGTT-I1FHfTdCt7crJyHQhN2dT5nDbfQ-2Wzvix2Z-A/exec"; 
+
+        function syncIdMascota() {
+            const especieRadio = document.querySelector('input[name="especie"]:checked');
+            let especieTxt = especieRadio ? especieRadio.value : "";
+            const nombre = document.getElementById('inputPetNombre').value.trim() || "Mascota";
+            const sexo = document.getElementById('inputPetSexo').value;
+            let detalleExtra = "";
+
+            if (especieTxt === "Gato") {
+                detalleExtra = "Gato";
+            } else if (especieTxt === "Otro") {
+                detalleExtra = document.getElementById('inputCualEspecie').value.trim() || "Mascota";
+            } else {
+                detalleExtra = document.getElementById('inputPetRaza').value.trim() || "Mestizo";
+            }
+            document.getElementById('inputIdMascota').value = `${nombre} - ${sexo} - ${detalleExtra}`;
+        }
+
+        function toggleOtroSector() {
+            const s = document.getElementById('sectorSelect');
+            const d = document.getElementById('divOtroSector');
+            d.classList.toggle('hidden-field', s.value !== 'otro');
+        }
+
+        function toggleOtraCondicion() {
+            const s = document.getElementById('condicionSelect');
+            const d = document.getElementById('divOtraCondicion');
+            d.classList.toggle('hidden-field', s.value !== 'otro');
+        }
+
+        function updateMascotaUI() {
+            const especieElement = document.querySelector('input[name="especie"]:checked');
+            if (!especieElement) return;
+            const especie = especieElement.value;
+            const divTamano = document.getElementById('divTamano');
+            const divEtapa = document.getElementById('divEtapa');
+            const divRaza = document.getElementById('divRaza');
+            const divCualEspecie = document.getElementById('divCualEspecie');
+            const etapaSelect = document.getElementById('etapaSelect');
+            const detalles = document.getElementById('detallesEdad');
+            const divPeso = document.getElementById('divPeso');
+            
+            divCualEspecie.classList.toggle('hidden-field', especie !== 'Otro');
+            divRaza.classList.toggle('hidden-field', especie !== 'Perro');
+            divTamano.classList.toggle('hidden-field', especie !== 'Perro');
+            divEtapa.classList.toggle('hidden-field', especie === 'Otro');
+
+            // Corrección: Quitar el "requerido" si el campo está oculto (Especie: Otro)
+            etapaSelect.required = (especie !== 'Otro');
+
+            if (especie === 'Otro') {
+                detalles.classList.remove('hidden-field');
+                divPeso.classList.remove('hidden-field');
+                document.getElementById('campoAniosVida').classList.remove('hidden-field');
+                document.getElementById('campoEdadMeses').classList.add('hidden-field');
+                document.getElementById('campoPesoEstimado').classList.add('hidden-field');
+            } else {
+                divEtapa.classList.remove('hidden-field');
+                etapaSelect.innerHTML = '<option value="">Seleccione etapa...</option>';
+                if (especie === 'Perro') {
+                    etapaSelect.innerHTML += '<option value="Cachorro">Cachorro</option><option value="Adulto">Adulto</option><option value="Senior">Senior</option>';
+                } else if (especie === 'Gato') {
+                    etapaSelect.innerHTML += '<option value="Gatito">Gatito</option><option value="Adulto">Adulto</option>';
+                }
+                updateEtapaUI();
+            }
+            syncIdMascota();
+        }
+
+        function updateEtapaUI() {
+            const especieRadio = document.querySelector('input[name="especie"]:checked');
+            if(!especieRadio || especieRadio.value === 'Otro') return;
+            
+            const etapa = document.getElementById('etapaSelect').value;
+            const detalles = document.getElementById('detallesEdad');
+            const divPeso = document.getElementById('divPeso');
+            
+            document.getElementById('campoEdadMeses').classList.add('hidden-field');
+            document.getElementById('campoPesoEstimado').classList.add('hidden-field');
+            document.getElementById('campoAniosVida').classList.add('hidden-field');
+            detalles.classList.add('hidden-field');
+            divPeso.classList.add('hidden-field');
+
+            if (!etapa) return;
+
+            if (etapa !== 'Cachorro' && etapa !== 'Gatito') {
+                divPeso.classList.remove('hidden-field');
+            }
+
+            if (etapa === 'Cachorro' || etapa === 'Gatito') {
+                detalles.classList.remove('hidden-field');
+                document.getElementById('campoEdadMeses').classList.remove('hidden-field');
+                if (especieRadio.value === 'Perro') {
+                    document.getElementById('campoPesoEstimado').classList.remove('hidden-field');
+                }
+            } 
+        }
+
+        document.getElementById('petForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const whatsappVal = document.getElementById('whatsapp').value;
+            if(whatsappVal.length !== 11) {
+                alert("El número de WhatsApp debe tener exactamente 11 dígitos numéricos.");
+                return;
+            }
+
+            syncIdMascota();
+            
+            const loader = document.getElementById('loader');
+            loader.style.display = 'flex';
+
+            const formData = new FormData(this);
+              const urlParams = new URLSearchParams(window.location.search);
+        const esQR = urlParams.get('origen') === 'qr';
+
+        fetch(SCRIPT_URL, { method: 'POST', body: formData })
+            .then(() => {
+                document.getElementById('loader').style.display = 'none';
+                
+                if (esQR) {
+                    // Acción para el QR: Redirige a WhatsApp
+                    const tutor = formData.get('nombre_tutor');
+                    const mascota = formData.get('pet_nombre');
+                    const texto = `¡Hola Quilapets! Soy ${tutor}, acabo de inscribir a ${mascota} al Club vía QR. 🐾`;
+                    window.location.href = `https://wa.me{MI_WHATSAPP}?text=${encodeURIComponent(texto)}`;
+                } else {
+                    // Acción para el Link enviado por chat: Solo mensaje en pantalla
+                    document.getElementById('formContainer').innerHTML = `
+                        <div class="p-10 text-center">
+                            <h2 class="text-2xl font-bold text-indigo-700">¡Registro Exitoso!</h2>
+                            <p class="mt-4 text-gray-600">Gracias por unir a <b>${formData.get('pet_nombre')}</b> al Club.</p>
+                            <button onclick="location.reload()" class="mt-6 bg-indigo-600 text-white px-6 py-2 rounded-lg">Inscribir otra mascota</button>
+                        </div>`;
+                }
+            })
+            .catch(err => {
+                document.getElementById('loader').style.display = 'none';
+                alert("Error al enviar. Intenta de nuevo.");
+            });
+        });
+    </script>
+</body>
+</html>
